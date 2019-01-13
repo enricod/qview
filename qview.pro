@@ -35,7 +35,7 @@ FORMS += \
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../usr/local/lib/release/ -lraw
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../usr/local/lib/debug/ -lraw
-else:unix: LIBS += -L$$PWD/../../../../usr/local/lib/ -lraw
+else:unix: LIBS += -L$$PWD/lib/ -lraw
 
-INCLUDEPATH += $$PWD/../../../../usr/local/include/libraw
-DEPENDPATH += $$PWD/../../../../usr/local/include/libraw
+INCLUDEPATH += $$PWD/lib/include/libraw
+DEPENDPATH += $$PWD/lib/include/libraw
