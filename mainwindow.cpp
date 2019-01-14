@@ -6,6 +6,7 @@
 #include <QDirIterator>
 #include <QImage>
 #include <QPixmap>
+#include "scandirworker.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -42,29 +43,34 @@ void MainWindow::extractThumbs() {
 
 
 
-//    QThread* thread = new QThread;
-//    Worker* worker = new Worker();
-//    worker->moveToThread(thread);
+    QThread* thread = new QThread;
+    ScanDirWorker* worker = new ScanDirWorker();
+    worker->setCurDir(curDir);
+    worker->moveToThread(thread);
 //    connect(worker, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
-//    connect(thread, SIGNAL(started()), worker, SLOT(process()));
-//    connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
-//    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
-//    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-//    thread->start();
+    connect(thread, SIGNAL(started()), worker, SLOT(process()));
+    connect(worker, SIGNAL(finished(QStringList)), this, SLOT(imagesList(QStringList)));
+    connect(worker, SIGNAL(finished(QStringList)), thread, SLOT(quit()));
+    connect(worker, SIGNAL(finished(QStringList)), worker, SLOT(deleteLater()));
+    //connect(thread, SIGNAL(finished(QStringList)), thread, SLOT(deleteLater()));
+    thread->start();
 
+//    QDirIterator it(curDir.absolutePath(), QStringList() << "*.ARW", QDir::Files, QDirIterator::Subdirectories);
+//    int i =0;
+//    while (it.hasNext()) {
+//        QString imgName = it.next();
+//        qInfo("found %s", qUtf8Printable( imgName ));
+//        if (i==0) {
+//            processImage( imgName);
+//        }
+//        i++;
+//    }
 
+}
 
-    QDirIterator it(curDir.absolutePath(), QStringList() << "*.ARW", QDir::Files, QDirIterator::Subdirectories);
-    int i =0;
-    while (it.hasNext()) {
-        QString imgName = it.next();
-        qInfo("found %s", qUtf8Printable( imgName ));
-        if (i==0) {
-            processImage( imgName);
-        }
-        i++;
-    }
-
+void MainWindow::imagesList(QStringList images)
+{
+    qInfo("Immagini caricate %d", images.length());
 }
 
 QImage *MainWindow::createThumb(libraw_processed_image_t *img) { //, const QString imgName) {

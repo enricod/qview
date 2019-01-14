@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QStringList>
 #include <QImage>
+#include <QDir>
 
 class ScanDirWorker : public QObject
 {
@@ -12,8 +13,10 @@ class ScanDirWorker : public QObject
 public:
     explicit ScanDirWorker(QObject *parent = nullptr);
 
+    void setCurDir(QDir curDir);
+
 public slots:
-    void process(QString dir);
+    void process();
 
     void extractImage(QString imageFile);
 
@@ -26,6 +29,8 @@ signals:
 
 private:
     QStringList images;
+
+    QDir curDir;
 };
 
 #endif // SCANDIRWORKER_H

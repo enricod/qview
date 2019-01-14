@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QDir>
+#include <QThread>
 
 #include "libraw/libraw.h"
 
@@ -23,6 +24,8 @@ private slots:
     void extractThumbs();
 
     void on_startProcessingBtn_clicked();
+
+    void imagesList(QStringList images);
 
 private:
     Ui::MainWindow *ui;
