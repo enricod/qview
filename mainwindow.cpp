@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
 
-    curDir = QDir("/data2/Pictures/2019/01");
+    curDir = QDir("/home/enricodonelli/Pictures/2018/10/04");
     ui->setupUi(this);
 
 
@@ -41,7 +41,20 @@ void MainWindow::extractThumbs() {
     //qInfo( curDir.absolutePath().toStdString().c_str());
 
 
-    QDirIterator it(curDir.absolutePath(), QStringList() << "*.ORF", QDir::Files, QDirIterator::Subdirectories);
+
+//    QThread* thread = new QThread;
+//    Worker* worker = new Worker();
+//    worker->moveToThread(thread);
+//    connect(worker, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
+//    connect(thread, SIGNAL(started()), worker, SLOT(process()));
+//    connect(worker, SIGNAL(finished()), thread, SLOT(quit()));
+//    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+//    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+//    thread->start();
+
+
+
+    QDirIterator it(curDir.absolutePath(), QStringList() << "*.ARW", QDir::Files, QDirIterator::Subdirectories);
     int i =0;
     while (it.hasNext()) {
         QString imgName = it.next();
