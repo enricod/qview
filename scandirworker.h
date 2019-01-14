@@ -18,12 +18,9 @@ public:
 public slots:
     void process();
 
-    void extractImage(QString imageFile);
 
 signals:
     void finished(QStringList images);
-
-    void imageExtracted();
 
     void error(QString err);
 

@@ -42,7 +42,6 @@ void MainWindow::extractThumbs() {
     //qInfo( curDir.absolutePath().toStdString().c_str());
 
 
-
     QThread* thread = new QThread;
     ScanDirWorker* worker = new ScanDirWorker();
     worker->setCurDir(curDir);
@@ -55,16 +54,16 @@ void MainWindow::extractThumbs() {
     //connect(thread, SIGNAL(finished(QStringList)), thread, SLOT(deleteLater()));
     thread->start();
 
-//    QDirIterator it(curDir.absolutePath(), QStringList() << "*.ARW", QDir::Files, QDirIterator::Subdirectories);
-//    int i =0;
-//    while (it.hasNext()) {
-//        QString imgName = it.next();
-//        qInfo("found %s", qUtf8Printable( imgName ));
-//        if (i==0) {
-//            processImage( imgName);
-//        }
-//        i++;
-//    }
+    QDirIterator it(curDir.absolutePath(), QStringList() << "*.ARW", QDir::Files, QDirIterator::Subdirectories);
+    int i =0;
+    while (it.hasNext()) {
+        QString imgName = it.next();
+        qInfo("found %s", qUtf8Printable( imgName ));
+        if (i==0) {
+            processImage( imgName);
+        }
+        i++;
+    }
 
 }
 

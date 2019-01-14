@@ -14,11 +14,7 @@ void ScanDirWorker::setCurDir(QDir dir)
 void ScanDirWorker::process()
 {
     // allocate resources using new here
-    qDebug("processing %s", curDir.absolutePath());
+    qDebug("processing %s", qUtf8Printable(curDir.absolutePath()));
     emit finished(images);
 }
 
-void ScanDirWorker::extractImage(QString imageFile) {
-    qDebug("processing %s", imageFile);
-    emit imageExtracted();
-}
