@@ -7,17 +7,22 @@
 #include <QImage>
 #include <QPixmap>
 #include "scandirworker.h"
+#include <QStringListModel>
+#include <QStringList>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-
     curDir = QDir("/home/enricodonelli/Pictures/2018/10/04");
     ui->setupUi(this);
-
-
     createActions();
+
+    imagesListModel = new QStringListModel(this);
+
+
+    connect(ui->imagesListView, SIGNAL(activated(QModelIndex)),
+                this, SLOT(onImageItemClicked(QModelIndex)));
 }
 
 MainWindow::~MainWindow() {
@@ -54,6 +59,8 @@ void MainWindow::extractThumbs() {
     //connect(thread, SIGNAL(finished(QStringList)), thread, SLOT(deleteLater()));
     thread->start();
 
+    QStringList myList;
+
     QDirIterator it(curDir.absolutePath(), QStringList() << "*.ARW", QDir::Files, QDirIterator::Subdirectories);
     int i =0;
     while (it.hasNext()) {
@@ -62,9 +69,23 @@ void MainWindow::extractThumbs() {
         if (i==0) {
             processImage( imgName);
         }
+        myList << imgName;
         i++;
     }
 
+
+
+    // Populate our model
+    imagesListModel->setStringList(myList);
+
+    // Glue model and view together
+    ui->imagesListView->setModel(imagesListModel);
+
+}
+
+void MainWindow::onImageItemClicked(QModelIndex item) {
+
+    qInfo("* * * * * * * * * *click %d", item.row());
 }
 
 void MainWindow::imagesList(QStringList images)

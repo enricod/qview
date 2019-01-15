@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <QImage>
 #include <QDir>
+#include <QStringListModel>
 
 class ScanDirWorker : public QObject
 {
@@ -28,6 +29,9 @@ private:
     QStringList images;
 
     QDir curDir;
+
+
+
 };
 
 #endif // SCANDIRWORKER_H
