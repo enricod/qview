@@ -36,6 +36,8 @@ private:
 
     void createActions();
 
+    void selectImage(int imageIndex);
+
     int processImage(QString file);
 
     QImage *createThumb(libraw_processed_image_t *img); //, const QString imgName);

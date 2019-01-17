@@ -29,9 +29,6 @@ private:
     QStringList images;
 
     QDir curDir;
-
-
-
 };
 
 #endif // EXTRACTIMAGEWORKER_H

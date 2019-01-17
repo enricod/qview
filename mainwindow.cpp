@@ -2,11 +2,11 @@
 #include "ui_mainwindow.h"
 #include "libraw/libraw.h"
 #include <QDir>
-#include <qiterator.h>
-#include <QDirIterator>
+
 #include <QImage>
 #include <QPixmap>
 #include "scandirworker.h"
+#include "extractimageworker.h"
 #include <QStringListModel>
 #include <QStringList>
 
@@ -20,38 +20,38 @@ MainWindow::MainWindow(QWidget *parent) :
 
     imagesListModel = new QStringListModel(this);
 
-
     connect(ui->imagesListView, SIGNAL(activated(QModelIndex)),
-                this, SLOT(onImageItemClicked(QModelIndex)));
+            this, SLOT(onImageItemClicked(QModelIndex)));
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
     delete ui;
 }
 
 void MainWindow::createActions()
 {
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-      QToolBar *fileToolBar = addToolBar(tr("File"));
-      const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
-      QAction *newAct = new QAction(newIcon, tr("&New"), this);
-      newAct->setShortcuts(QKeySequence::New);
-      newAct->setStatusTip(tr("Create a new file"));
-      connect(newAct, &QAction::triggered, this, &MainWindow::extractThumbs);
-      fileMenu->addAction(newAct);
-      fileToolBar->addAction(newAct);
+    QToolBar *fileToolBar = addToolBar(tr("File"));
+    const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
+    QAction *newAct = new QAction(newIcon, tr("&New"), this);
+    newAct->setShortcuts(QKeySequence::New);
+    newAct->setStatusTip(tr("Create a new file"));
+    connect(newAct, &QAction::triggered, this, &MainWindow::extractThumbs);
+    fileMenu->addAction(newAct);
+    fileToolBar->addAction(newAct);
 }
 
-void MainWindow::extractThumbs() {
+void MainWindow::extractThumbs()
+{
     qInfo("%s", qUtf8Printable(curDir.absolutePath()));
-    //qInfo( curDir.absolutePath().toStdString().c_str());
 
-
+    // Avvia thread per lettura delle immagini nella directory
     QThread* thread = new QThread;
     ScanDirWorker* worker = new ScanDirWorker();
     worker->setCurDir(curDir);
     worker->moveToThread(thread);
-//    connect(worker, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
+    //    connect(worker, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
     connect(thread, SIGNAL(started()), worker, SLOT(process()));
     connect(worker, SIGNAL(finished(QStringList)), this, SLOT(imagesList(QStringList)));
     connect(worker, SIGNAL(finished(QStringList)), thread, SLOT(quit()));
@@ -59,41 +59,50 @@ void MainWindow::extractThumbs() {
     //connect(thread, SIGNAL(finished(QStringList)), thread, SLOT(deleteLater()));
     thread->start();
 
-    QStringList myList;
-
-    QDirIterator it(curDir.absolutePath(), QStringList() << "*.ARW", QDir::Files, QDirIterator::Subdirectories);
-    int i =0;
-    while (it.hasNext()) {
-        QString imgName = it.next();
-        qInfo("found %s", qUtf8Printable( imgName ));
-        if (i==0) {
-            processImage( imgName);
-        }
-        myList << imgName;
-        i++;
-    }
-
-
-
-    // Populate our model
-    imagesListModel->setStringList(myList);
-
-    // Glue model and view together
-    ui->imagesListView->setModel(imagesListModel);
-
 }
 
-void MainWindow::onImageItemClicked(QModelIndex item) {
-
-    qInfo("* * * * * * * * * *click %d", item.row());
+void MainWindow::onImageItemClicked(QModelIndex item)
+{
+    selectImage(item.row());
 }
 
+/**
+ * @brief MainWindow::imagesList
+ * @param images immagini lette nella directory selezionata
+ */
 void MainWindow::imagesList(QStringList images)
 {
     qInfo("Immagini caricate %d", images.length());
+
+    // Populate our model
+    imagesListModel->setStringList(images);
+
+    // Glue model and view together
+    ui->imagesListView->setModel(imagesListModel);
 }
 
-QImage *MainWindow::createThumb(libraw_processed_image_t *img) { //, const QString imgName) {
+/**
+ * @brief MainWindow::selectImage
+ * @param imageIndex l'immagine da selezionare e da caricare
+ */
+void MainWindow::selectImage(int imageIndex)
+{
+    qInfo("Immagini selezionata %d", imageIndex);
+
+    QThread* thread = new QThread;
+    ExtractImageWorker* worker = new ExtractImageWorker();
+    worker->setCurDir(curDir);
+    worker->moveToThread(thread);
+    //connect(thread, SIGNAL(started()), worker, SLOT(process()));
+    //connect(worker, SIGNAL(finished(QStringList)), this, SLOT(imagesList(QStringList)));
+    //connect(worker, SIGNAL(finished(QStringList)), thread, SLOT(quit()));
+    //connect(worker, SIGNAL(finished(QStringList)), worker, SLOT(deleteLater()));
+    thread->start();
+}
+
+
+QImage *MainWindow::createThumb(libraw_processed_image_t *img)
+{
 
     if (!img) {
         return NULL;
@@ -113,14 +122,14 @@ QImage *MainWindow::createThumb(libraw_processed_image_t *img) { //, const QStri
         //QImage result = QImage::loadFromData(img->data, img->data_size, "JPG");
         return result;
 
-//        char fn[1024];
-//        snprintf(fn, 1024, "%s.thumb.jpg", qUtf8Printable(imgName));
-//        FILE *f = fopen(fn, "wb");
-//        if (!f)
-//          return;
-//        fwrite(img->data, img->data_size, 1, f);
-//        qInfo("scrittara %s", fn);
-//        fclose(f);
+        //        char fn[1024];
+        //        snprintf(fn, 1024, "%s.thumb.jpg", qUtf8Printable(imgName));
+        //        FILE *f = fopen(fn, "wb");
+        //        if (!f)
+        //          return;
+        //        fwrite(img->data, img->data_size, 1, f);
+        //        qInfo("scrittara %s", fn);
+        //        fclose(f);
     }
 }
 
@@ -144,9 +153,11 @@ int MainWindow::processImage( QString imgName){
 
     // Convert from imgdata.rawdata to imgdata.image:
     // iProcessor.raw2image();
-    if ( (ret = iProcessor.unpack_thumb()) != LIBRAW_SUCCESS ) {
+    if ( (ret = iProcessor.unpack_thumb()) != LIBRAW_SUCCESS )
+    {
 
-    } else {
+    } else
+    {
         libraw_processed_image_t *thumb = iProcessor.dcraw_make_mem_thumb(&ret);
         if (thumb) {
             qInfo("salvo miniatura %s", qUtf8Printable( imgName));
@@ -162,28 +173,29 @@ int MainWindow::processImage( QString imgName){
 
             LibRaw::dcraw_clear_mem(thumb);
         } else {
-           fprintf(stderr, "Cannot unpack thumbnail of %s to memory buffer: %s\n", qUtf8Printable(imgName), libraw_strerror(ret));
+            fprintf(stderr, "Cannot unpack thumbnail of %s to memory buffer: %s\n", qUtf8Printable(imgName), libraw_strerror(ret));
         }
 
     }
 
 
 
-        // And let us print its dump; the data are accessible through data fields of the class
-//        for(int i = 0;i < iProcessor.imgdata.sizes.iwidth *  iProcessor.imgdata.sizes.iheight; i++)
-//           printf("i=%d R=%d G=%d B=%d G2=%d\n",
-//                        i,
-//                        iProcessor.imgdata.image[i][0],
-//                        iProcessor.imgdata.image[i][1],
-//                        iProcessor.imgdata.image[i][2],
-//                        iProcessor.imgdata.image[i][3]
-//                );
+    // And let us print its dump; the data are accessible through data fields of the class
+    //        for(int i = 0;i < iProcessor.imgdata.sizes.iwidth *  iProcessor.imgdata.sizes.iheight; i++)
+    //           printf("i=%d R=%d G=%d B=%d G2=%d\n",
+    //                        i,
+    //                        iProcessor.imgdata.image[i][0],
+    //                        iProcessor.imgdata.image[i][1],
+    //                        iProcessor.imgdata.image[i][2],
+    //                        iProcessor.imgdata.image[i][3]
+    //                );
 
     // Finally, let us free the image processor for work with the next image
     iProcessor.recycle();
     return 0;
 }
 
-void MainWindow::on_startProcessingBtn_clicked() {
+void MainWindow::on_startProcessingBtn_clicked()
+{
     extractThumbs();
 }
