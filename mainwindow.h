@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QDir>
+#include <QThread>
+#include <QStringListModel>
+#include <QListWidgetItem>
 
 #include "libraw/libraw.h"
 
@@ -24,19 +27,28 @@ private slots:
 
     void on_startProcessingBtn_clicked();
 
+    void imagesList(QStringList images);
+
+    void onImageItemClicked(QModelIndex item);
+
 private:
     Ui::MainWindow *ui;
 
     void createActions();
 
-    int processImage(  QString file);
+    void selectImage(int imageIndex);
+
+    int processImage(QString file);
 
     QImage *createThumb(libraw_processed_image_t *img); //, const QString imgName);
 
-    //void extractThumbs();
-
     // current directory
     QDir curDir;
+
+    // indice dell'immagine corrente
+    int imgIndex;
+
+    QStringListModel *imagesListModel;
 };
 
 #endif // MAINWINDOW_H
