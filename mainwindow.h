@@ -29,6 +29,8 @@ private slots:
 
     void imagesList(QStringList images);
 
+    void imageLoaded(QImage* img);
+
     void onImageItemClicked(QModelIndex item);
 
 private:
