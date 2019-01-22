@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->imagesListView, SIGNAL(activated(QModelIndex)),
             this, SLOT(onImageItemClicked(QModelIndex)));
 
-     ui->currentDirLabel->setText( curDir.absolutePath());
+    ui->currentDirLabel->setText( curDir.absolutePath());
 }
 
 MainWindow::~MainWindow()
@@ -117,12 +117,29 @@ void MainWindow::selectImage(int imageIndex)
 void MainWindow::imageLoaded(QImage* img)
 {
     qInfo("immagine caricata");
+
     ui->mainImageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    ui->mainImageLabel->setScaledContents(true);
-    ui->mainImageLabel->setPixmap( QPixmap::fromImage(*img));
+    //ui->mainImageLabel->setScaledContents(true);
+
+    ui->mainImageLabel->setPixmap( QPixmap::fromImage(*img).scaled(img->size()*0.4));
+
+    double factor = 0.1;
+    QSize pixmapSize = ui->mainImageLabel->pixmap()->size();
+    qInfo("B: img size %d, pixmap size %d x %d", img->width(), ui->mainImageLabel->pixmap()->size().width(), ui->mainImageLabel->pixmap()->size().height());
+    //ui->mainImageLabel->resize(QSize(100,100));
+
+    //adjustScrollBar( ui->scrollArea->horizontalScrollBar(), factor);
+    //adjustScrollBar( ui->scrollArea->verticalScrollBar(), factor);
+
     //scaleFactor = 1.0;
 
     ui->scrollArea->setVisible(true);
+}
+
+void MainWindow::adjustScrollBar(QScrollBar *scrollBar, double factor)
+{
+    scrollBar->setValue(int(factor * scrollBar->value()
+                            + ((factor - 1) * scrollBar->pageStep()/2)));
 }
 
 void MainWindow::on_startProcessingBtn_clicked()

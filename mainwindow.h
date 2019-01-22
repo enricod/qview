@@ -6,7 +6,7 @@
 #include <QThread>
 #include <QStringListModel>
 #include <QListWidgetItem>
-
+#include <QScrollBar>
 #include "libraw/libraw.h"
 
 namespace Ui {
@@ -43,6 +43,8 @@ private:
     void selectImage(int imageIndex);
 
     int processImage(QString file);
+
+    void adjustScrollBar(QScrollBar *scrollBar, double factor);
 
     QImage *createThumb(libraw_processed_image_t *img); //, const QString imgName);
 
