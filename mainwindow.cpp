@@ -15,7 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    curDir = QDir("/home/enricodonelli/Pictures/2018/10/04");
+    curDir = QDir::home();
+
     //curDir = QDir("/data2/Pictures/2019/01");
     ui->setupUi(this);
     createActions();
@@ -24,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->imagesListView, SIGNAL(activated(QModelIndex)),
             this, SLOT(onImageItemClicked(QModelIndex)));
+
+     ui->currentDirLabel->setText( curDir.absolutePath());
 }
 
 MainWindow::~MainWindow()
@@ -48,6 +51,7 @@ void MainWindow::createActions()
 void MainWindow::selectDir()
 {
     curDir = QFileDialog::getExistingDirectory(0, ("Select Output Folder"), QDir::home().absolutePath());
+    ui->currentDirLabel->setText( curDir.absolutePath());
     extractThumbs();
 }
 void MainWindow::extractThumbs()
