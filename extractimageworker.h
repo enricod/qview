@@ -1,6 +1,7 @@
 #ifndef EXTRACTIMAGEWORKER_H
 #define EXTRACTIMAGEWORKER_H
 
+#include "libraw/libraw.h"
 #include <QObject>
 #include <QStringList>
 #include <QImage>
@@ -14,21 +15,23 @@ class ExtractImageWorker : public QObject
 public:
     explicit ExtractImageWorker(QObject *parent = nullptr);
 
-    void setCurDir(QDir curDir);
+    void setImage(QString image);
 
 public slots:
     void process();
 
 
 signals:
-    void finished(QStringList images);
+    void finished(QImage *qimage);
 
     void error(QString err);
 
 private:
-    QStringList images;
 
-    QDir curDir;
+    QImage* createThumb(libraw_processed_image_t *img);
+
+    QString image;
+
 };
 
 #endif // EXTRACTIMAGEWORKER_H

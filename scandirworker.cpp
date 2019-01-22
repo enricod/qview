@@ -17,7 +17,7 @@ void ScanDirWorker::process()
     // allocate resources using new here
     qDebug("processing %s", qUtf8Printable(curDir.absolutePath()));
 
-    QDirIterator it(curDir.absolutePath(), QStringList() << "*.ARW", QDir::Files, QDirIterator::Subdirectories);
+    QDirIterator it(curDir.absolutePath(), QStringList() << "*.ARW" << "*.ORF" << ".CR2" << "*.RAF", QDir::Files, QDirIterator::Subdirectories);
     int i =0;
     while (it.hasNext()) {
         QString imgName = it.next();
