@@ -25,9 +25,13 @@ private slots:
 
     void extractThumbs();
 
+    void selectDir();
+
     void on_startProcessingBtn_clicked();
 
     void imagesList(QStringList images);
+
+    void imageLoaded(QImage* img);
 
     void onImageItemClicked(QModelIndex item);
 
