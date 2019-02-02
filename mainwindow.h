@@ -4,14 +4,19 @@
 #include <QMainWindow>
 #include <QDir>
 #include <QThread>
+
 #include <QStringListModel>
 #include <QListWidgetItem>
 
 #include "libraw/libraw.h"
 
+
 namespace Ui {
+
 class MainWindow;
 }
+
+
 
 class MainWindow : public QMainWindow
 {
@@ -50,7 +55,11 @@ private:
     // indice dell'immagine corrente
     int imgIndex;
 
+    QImage *currentImg;
+
     QStringListModel *imagesListModel;
+
+
 };
 
 #endif // MAINWINDOW_H
