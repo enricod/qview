@@ -43,4 +43,3 @@ else:unix: LIBS += -L$$PWD/lib/ -lraw
 
 INCLUDEPATH += $$PWD/lib/include/libraw
 DEPENDPATH += $$PWD/lib/include/libraw
-

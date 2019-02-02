@@ -9,12 +9,15 @@
 #include <QStringListModel>
 #include <QStringList>
 
+#include <QFileDialog>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    //curDir = QDir("/home/enricodonelli/Pictures/2018/10/04");
-    curDir = QDir("/data2/Pictures/2019/01");
+    curDir = QDir::home();
+
+    //curDir = QDir("/data2/Pictures/2019/01");
     ui->setupUi(this);
     createActions();
 
@@ -23,6 +26,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->imagesListView, SIGNAL(activated(QModelIndex)),
             this, SLOT(onImageItemClicked(QModelIndex)));
+
+    ui->currentDirLabel->setText( curDir.absolutePath());
 }
 
 MainWindow::~MainWindow()
@@ -37,12 +42,19 @@ void MainWindow::createActions()
     const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
     QAction *newAct = new QAction(newIcon, tr("&New"), this);
     newAct->setShortcuts(QKeySequence::New);
-    newAct->setStatusTip(tr("Create a new file"));
-    connect(newAct, &QAction::triggered, this, &MainWindow::extractThumbs);
+    newAct->setStatusTip(tr("Select directory"));
+    connect(newAct, &QAction::triggered, this, &MainWindow::selectDir);
     fileMenu->addAction(newAct);
     fileToolBar->addAction(newAct);
 }
 
+
+void MainWindow::selectDir()
+{
+    curDir = QFileDialog::getExistingDirectory(0, ("Select Output Folder"), QDir::home().absolutePath());
+    ui->currentDirLabel->setText( curDir.absolutePath());
+    extractThumbs();
+}
 void MainWindow::extractThumbs()
 {
     qInfo("%s", qUtf8Printable(curDir.absolutePath()));
@@ -106,23 +118,30 @@ void MainWindow::selectImage(int imageIndex)
 void MainWindow::imageLoaded(QImage* img)
 {
     qInfo("immagine caricata");
-    //ui->mainImageLabel->setBackgroundRole(QPalette::Base);
-    ui->mainImageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    ui->mainImageLabel->setScaledContents(true);
-    QPixmap pixmap = QPixmap::fromImage(*img);
-    //int w = ui->mainImageLabel->width();
-    //int h = ui->mainImageLabel->height();
-    ui->mainImageLabel->setPixmap( pixmap); //.scaled(w,h, Qt::KeepAspectRatio));
-    //ui->mainImageLabel->resize( ui->mainImageLabel->pixmap()->size());
 
-    //ui->mainImageLabel->resize(ui->mainImageLabel->pixmap()->size());
+    ui->mainImageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    //ui->mainImageLabel->setScaledContents(true);
+
+    ui->mainImageLabel->setPixmap( QPixmap::fromImage(*img).scaled(img->size()*0.4));
+
+    double factor = 0.1;
+    QSize pixmapSize = ui->mainImageLabel->pixmap()->size();
+    qInfo("B: img size %d, pixmap size %d x %d", img->width(), ui->mainImageLabel->pixmap()->size().width(), ui->mainImageLabel->pixmap()->size().height());
+    //ui->mainImageLabel->resize(QSize(100,100));
+
+    //adjustScrollBar( ui->scrollArea->horizontalScrollBar(), factor);
+    //adjustScrollBar( ui->scrollArea->verticalScrollBar(), factor);
+
     //scaleFactor = 1.0;
 
-    //ui->scrollArea->setVisible(true);
-
-    delete img;
+    ui->scrollArea->setVisible(true);
 }
 
+void MainWindow::adjustScrollBar(QScrollBar *scrollBar, double factor)
+{
+    scrollBar->setValue(int(factor * scrollBar->value()
+                            + ((factor - 1) * scrollBar->pageStep()/2)));
+}
 
 void MainWindow::on_startProcessingBtn_clicked()
 {
