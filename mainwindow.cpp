@@ -115,6 +115,7 @@ void MainWindow::selectImage(int imageIndex)
 }
 
 
+
 void MainWindow::imageLoaded(QImage* img)
 {
     qInfo("immagine caricata");
@@ -122,7 +123,7 @@ void MainWindow::imageLoaded(QImage* img)
     ui->mainImageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     //ui->mainImageLabel->setScaledContents(true);
 
-    ui->mainImageLabel->setPixmap( QPixmap::fromImage(*img).scaled(img->size()*0.4));
+    ui->mainImageLabel->setPixmap( QPixmap::fromImage(*img).scaled(img->size()*0.2));
 
     double factor = 0.1;
     QSize pixmapSize = ui->mainImageLabel->pixmap()->size();
