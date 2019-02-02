@@ -8,6 +8,7 @@
 #include "extractimageworker.h"
 #include <QStringListModel>
 #include <QStringList>
+#include <QKeyEvent>
 
 #include <QFileDialog>
 
@@ -48,6 +49,33 @@ void MainWindow::createActions()
     fileToolBar->addAction(newAct);
 }
 
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    int imageIndex = 0;
+    if (event->key() == Qt::Key_J)
+    {
+        imageIndex = this->imgIndex -1;
+        if (imageIndex < 0) {
+            imageIndex = this->imagesListModel->stringList().length() -1;
+        }
+
+    } else if (event->key() == Qt::Key_K)
+    {
+
+        if (this->imgIndex >= 0)
+        {
+            imageIndex = this->imgIndex + 1;
+        }
+
+        if (imageIndex > this->imagesListModel->stringList().length() -1 ) {
+            imageIndex = 0;
+        }
+
+
+    }
+
+    this->selectImage(imageIndex);
+}
 
 void MainWindow::selectDir()
 {
@@ -101,6 +129,9 @@ void MainWindow::imagesList(QStringList images)
 void MainWindow::selectImage(int imageIndex)
 {
     qInfo("Immagini selezionata %d", imageIndex);
+    this->imgIndex = imageIndex;
+    //this->imagesListModel->imageIndex);
+     this->imagesListModel->index(imageIndex);
 
     QThread* thread = new QThread;
     ExtractImageWorker* worker = new ExtractImageWorker();

@@ -51,13 +51,15 @@ private:
 
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
 
+    void keyPressEvent(QKeyEvent *);
+
     QImage *createThumb(libraw_processed_image_t *img); //, const QString imgName);
 
     // current directory
     QDir curDir;
 
     // indice dell'immagine corrente
-    int imgIndex;
+    int imgIndex = -1;
 
     QImage *currentImg;
 
