@@ -37,11 +37,15 @@ void ExtractImageWorker::process()
     {
         //libraw_processed_image_t *thumb = iProcessor.dcraw_make_mem_thumb(&ret);
         // libraw_processed_image_t *thumb = iProcessor.dcraw_make_mem_image(&ret);
+
         libraw_processed_image_t *thumb = iProcessor.dcraw_make_mem_thumb(&ret);
         if (thumb) {
             QImage *imgThumb =  createThumb(thumb) ; //, imgName);
 
+            int flip = iProcessor.imgdata.sizes.flip;
 
+
+            qInfo("  flip = %d", iProcessor.imgdata.sizes.flip);
 //            //QPixmap::fromImage(imgThumb)
 //            ui->mainImageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 //            ui->mainImageLabel->setScaledContents(true);
