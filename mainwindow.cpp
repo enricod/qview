@@ -8,6 +8,7 @@
 #include "extractimageworker.h"
 #include <QStringListModel>
 #include <QStringList>
+#include <QKeyEvent>
 
 #include <QFileDialog>
 
@@ -20,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //curDir = QDir("/data2/Pictures/2019/01");
     ui->setupUi(this);
     createActions();
+
 
     imagesListModel = new QStringListModel(this);
 
@@ -47,6 +49,33 @@ void MainWindow::createActions()
     fileToolBar->addAction(newAct);
 }
 
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    int imageIndex = 0;
+    if (event->key() == Qt::Key_J)
+    {
+        imageIndex = this->imgIndex -1;
+        if (imageIndex < 0)
+        {
+            imageIndex = this->imagesListModel->stringList().length() -1;
+        }
+
+    } else if (event->key() == Qt::Key_K)
+    {
+
+        if (this->imgIndex >= 0)
+        {
+            imageIndex = this->imgIndex + 1;
+        }
+
+        if (imageIndex > this->imagesListModel->stringList().length() -1 ) {
+            imageIndex = 0;
+        }
+
+
+    }
+    this->selectImage(imageIndex);
+}
 
 void MainWindow::selectDir()
 {
@@ -100,6 +129,9 @@ void MainWindow::imagesList(QStringList images)
 void MainWindow::selectImage(int imageIndex)
 {
     qInfo("Immagini selezionata %d", imageIndex);
+    this->imgIndex = imageIndex;
+    //this->imagesListModel->imageIndex);
+     this->imagesListModel->index(imageIndex);
 
     QThread* thread = new QThread;
     ExtractImageWorker* worker = new ExtractImageWorker();
@@ -114,6 +146,7 @@ void MainWindow::selectImage(int imageIndex)
 }
 
 
+
 void MainWindow::imageLoaded(QImage* img)
 {
     qInfo("immagine caricata");
@@ -121,7 +154,7 @@ void MainWindow::imageLoaded(QImage* img)
     ui->mainImageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     //ui->mainImageLabel->setScaledContents(true);
 
-    ui->mainImageLabel->setPixmap( QPixmap::fromImage(*img).scaled(img->size()*0.4));
+    ui->mainImageLabel->setPixmap( QPixmap::fromImage(*img).scaled(img->size()*0.2));
 
     double factor = 0.1;
     QSize pixmapSize = ui->mainImageLabel->pixmap()->size();
